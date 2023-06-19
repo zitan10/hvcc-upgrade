@@ -1,4 +1,4 @@
-# This is my updated version of the open source tool Heavy Compiler Collection (hvcc)
+# This is my updated version of the open source tool Heavy Compiler Collection (hvcc) used to convert Pure Data files into WWISE audio plugins for Unreal/Unity Game Engines
 
 Original tool: https://github.com/enzienaudio/hvcc
 
