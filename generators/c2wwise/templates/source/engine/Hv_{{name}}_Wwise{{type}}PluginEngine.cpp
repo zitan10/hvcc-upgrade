@@ -159,13 +159,39 @@ void Hv_{{name}}_WwisePluginEngine::Execute(AkAudioBuffer *io_pBufferOut) {
   {% if isSource %}
   m_pHeavyContext->processInline(nullptr, buffer, numFramesToProcess);
   {% else %}
-  // Check for channel configuration mismatch
-  if (io_pBufferOut->NumChannels() == 1 &&
-    ((m_pHeavyContext->getNumInputChannels() == 2) || (m_pHeavyContext->getNumOutputChannels() == 2))) {
-    float *tempBuffer[2] = { buffer, buffer };
-    m_pHeavyContext->process(tempBuffer, tempBuffer, numFramesToProcess);
-  } else {
-    m_pHeavyContext->processInline(buffer, buffer, numFramesToProcess);
+  int io_outNumChannels = io_pBufferOut->NumChannels();
+
+  bool ioChannelsMatchInput = io_outNumChannels == m_pHeavyContext->getNumInputChannels();
+  bool ioChannelsMatchOutput = io_outNumChannels == m_pHeavyContext->getNumOutputChannels();
+
+  if ( ioChannelsMatchInput && ioChannelsMatchOutput )
+  {
+     m_pHeavyContext->processInline(buffer, buffer, numFramesToProcess);
+	 io_pBufferOut->uValidFrames = numFramesToProcess;
+  }
+  else
+  {
+    int io_outNumChannels = io_pBufferOut->NumChannels();
+	int heavy_outNumChannels = m_pHeavyContext->getNumOutputChannels();
+
+    if (io_outNumChannels < heavy_outNumChannels)
+    {
+      float **const buffers = reinterpret_cast<float **>(hv_alloca(heavy_outNumChannels * sizeof(float *)));
+	  
+      for (int i = 0; i < heavy_outNumChannels; ++i)
+      {
+        int io_channel = min(i, (io_outNumChannels - 1));
+        buffers[i] = (float*)io_pBufferOut->GetChannel(io_channel);			
+      }
+
+      m_pHeavyContext->process(buffers, buffers, numFramesToProcess);
+
+      io_pBufferOut->uValidFrames = numFramesToProcess;
+    }
+    else
+    { 
+      io_pBufferOut->uValidFrames = 0;
+	}
   }
   {% endif %}
   io_pBufferOut->uValidFrames = numFramesToProcess;
@@ -232,10 +258,17 @@ void Hv_{{name}}_WwisePluginEngine::SetOutRTPC(const char *rtpcName,
   // Set the RTPC value for the plugin's associated gameobject.
   // Note(joe): if the plugin is on a bus the gameobject will be null and thus
   // set the global RTPC.
+
+#if (AK_WWISESDK_VERSION_COMBINED < ((2021 << 8) | 1))
+  int pluginContextGameObjectID = m_pPluginContext->GetVoiceInfo()->GetGameObjectID();
+#else
+  int pluginContextGameObjectID = m_pPluginContext->GetGameObjectInfo()->GetGameObjectID();
+#endif
+
   m_pPluginContext->GlobalContext()->SetRTPCValue(
       hashFunc.Compute((unsigned char *) rtpcName, nameLength*sizeof(char)),
       value,
-      m_pPluginContext->GetVoiceInfo()->GetGameObjectID(),
+      pluginContextGameObjectID,
       0,
       AkCurveInterpolation_Linear,
       true); // disable interpolation, let the plugin handle it internally

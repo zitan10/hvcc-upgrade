@@ -1318,6 +1318,28 @@
       "sse": 3.5
     }
   },
+  "__vline~f": {
+    "inlets": [
+      "-->",
+      "-->",
+      "-->"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [
+
+    ],
+    "perf": {
+      "avx": 5.5,
+      "sse": 3.5
+    }
+  },
   "__log": {
     "inlets": [
       "-->"
@@ -3323,5 +3345,54 @@
     "outlets": [
       "signal"
     ]
+  },
+  "__threshold~": {
+    "inlets": [
+      "~f>",
+      "-->"
+    ],
+    "ir": {
+      "control": true,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "-->",
+      "-->"
+    ],
+    "args": [
+      {
+        "default": 0,
+        "value_type": "float",
+        "name": "triggerThreshold",
+        "description": "Bangs when input signal exceeds this value",
+        "required": false
+      },
+      {
+        "default": 0,
+        "value_type": "float",
+        "name": "triggerDebounceTime",
+        "description": "Debounce time when bang is triggered",
+        "required": false
+      },
+      {
+        "default": 0,
+        "value_type": "float",
+        "name": "restThreshold",
+        "description": "Rest when input signal goes below this value",
+        "required": false
+      },
+      {
+        "default": 0,
+        "value_type": "float",
+        "name": "restDebounceTime",
+        "description": "Debounce time when going into rest",
+        "required": false
+      }
+    ],
+    "perf": {
+      "avx": 0,
+      "sse": 0
+    }
   }
 }

@@ -39,9 +39,9 @@ class c2wwise:
         return hashlib.md5(s+"_fileref").hexdigest().upper()[0:24]
 
     @classmethod
-    def compile(clazz, c_src_dir, out_dir, externs,
-            patch_name=None, num_input_channels=0, num_output_channels=0,
-            copyright=None, verbose=False):
+    def compile(clazz, c_src_dir, out_dir, externs, wwise_version, audiokinetic_directory,
+                patch_name=None, num_input_channels=0, num_output_channels=0,
+                copyright=None, verbose=False):
 
         tick = time.time()
 
@@ -55,7 +55,7 @@ class c2wwise:
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         copyright_xml = copyright_manager.get_copyright_for_xml(copyright)
 
-        wwise_sdk_version = "2017.2.2.6553"
+        wwise_sdk_version = wwise_version
 
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
@@ -73,8 +73,6 @@ class c2wwise:
 
         try:
             if plugin_type == "FX":
-                if num_input_channels > 2:
-                    raise Exception("Wwise FX plugins support a maximum of 2 channels (i.e. [adc~ 1] or [adc~ 1 2]).")
                 if num_input_channels != num_output_channels:
                     raise Exception("Wwise FX plugins require the same input/output channel configuration (i.e. [adc~ 1] -> [dac~ 1]).")
 
@@ -160,6 +158,7 @@ class c2wwise:
                         plugin_type=plugin_type,
                         plugin_id=plugin_id,
                         wwise_version=wwise_sdk_version,
+                        audiokinetic_directory=audiokinetic_directory,
                         msbuild_version="140",
                         files=files))
 
@@ -175,7 +174,8 @@ class c2wwise:
                     plugin_type=plugin_type,
                     plugin_id=plugin_id,
                     files=files,
-                    wwise_version=wwise_sdk_version))
+                    wwise_version=wwise_sdk_version,
+                    audiokinetic_directory=audiokinetic_directory))
 
             proj_name = "Hv_{0}_Wwise{1}Plugin".format(patch_name, plugin_type)
 
@@ -201,6 +201,7 @@ class c2wwise:
                     "/t:Rebuild", "/m",
                     "{0}.sln".format(proj_name)])
 
+            print("{0}.sln".format(proj_name))
             return  {
                 "stage": "c2wwise",
                 "notifs": {

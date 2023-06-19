@@ -127,8 +127,8 @@ def generate_extern_info(hvir, results):
     }
 
 def compile_dataflow(in_path, out_dir, patch_name=None,
-        search_paths=None, generators=None, verbose=False,
-        copyright=None, hvir=None):
+                     search_paths=None, generators=None, verbose=False,
+                     copyright=None, hvir=None, wwise_version=None, audiokinetic_directory=None):
 
     results = OrderedDict() # default value, empty dictionary
 
@@ -312,6 +312,8 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
         results["c2wwise"] = c2wwise.c2wwise.compile(
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "wwise"),
+            wwise_version=wwise_version,
+            audiokinetic_directory=audiokinetic_directory,
             patch_name=patch_name,
             num_input_channels=num_input_channels,
             num_output_channels=num_output_channels,
@@ -359,6 +361,16 @@ def main():
     parser.add_argument(
         "--copyright",
         help="A string indicating the owner of the copyright.")
+    parser.add_argument(
+        "-wv",
+        "--wwise_version",
+        default="2021.1.5.7749",
+        help="Select your Wwise SDK version. 2021.1.5.7749 is default")
+    parser.add_argument(
+        "-ad",
+        "--audiokinetic_directory",
+        default="C:\Program Files (x86)\Audiokinetic",
+        help="Select your Audiokinetic install directory. Use quotations if path has spaces.")
     args = parser.parse_args()
 
     in_path = os.path.abspath(args.in_path)
@@ -369,7 +381,9 @@ def main():
         search_paths=args.search_paths,
         generators=args.gen,
         verbose=args.verbose,
-        copyright=args.copyright)
+        copyright=args.copyright,
+        wwise_version=args.wwise_version,
+        audiokinetic_directory=args.audiokinetic_directory)
 
     for r in results.values():
         # print any errors

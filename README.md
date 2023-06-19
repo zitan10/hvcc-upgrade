@@ -1,3 +1,9 @@
+# This is my updated version of the open source tool Heavy Compiler Collection (hvcc)
+
+Original tool: https://github.com/enzienaudio/hvcc
+
+This updated version uses the new version of the WWise 2020 SDK, as well as additional features such as threshold support
+
 # Heavy Compiler Collection (hvcc)
 
 `hvcc` is a python-based dataflow audio programming language compiler that generates C/C++ code and a variety of specific framework wrappers.

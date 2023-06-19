@@ -61,6 +61,8 @@ from SignalTabhead import SignalTabhead
 from SignalTabread import SignalTabread
 from SignalTabwrite import SignalTabwrite
 from SignalVar import SignalVar
+from SignalVLine import SignalVLine
+from SignalThreshold import SignalThreshold
 
 class ir2c:
 
@@ -83,6 +85,7 @@ class ir2c:
         "__biquad_k~f": SignalBiquad,
         "__env~f": SignalEnvelope,
         "__line~f": SignalLine,
+        "__vline~f": SignalVLine,
         "__lorenz~f": SignalLorenz,
         "__del1~f": SignalDel1,
         "__tabread~if": SignalTabread,
@@ -102,7 +105,8 @@ class ir2c:
         "__tabwrite": ControlTabwrite,
         "__pack": ControlPack,
         "__rpole~f": SignalRPole,
-        "__cpole~f": SignalCPole
+        "__cpole~f": SignalCPole,
+        "__threshold~": SignalThreshold
     }
 
     # the base set of C files necessary for the patch
